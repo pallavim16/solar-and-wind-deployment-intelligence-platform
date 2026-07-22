@@ -1,8 +1,11 @@
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import "../styles/login.css";
 
 function Login() {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -18,10 +21,18 @@ function Login() {
         }
       );
 
+      // Save token
+      localStorage.setItem("token", response.data.access_token);
+      localStorage.setItem("role", response.data.role);
+      localStorage.setItem("email", response.data.email);
+
       alert("Login Successful");
-      console.log(response.data);
+
+      // Redirect
+      navigate("/dashboard");
+
     } catch (error) {
-      alert("Login Failed");
+      alert(error.response?.data?.detail || "Login Failed");
       console.log(error);
     }
   };
@@ -47,7 +58,9 @@ function Login() {
           required
         />
 
-        <button type="submit">Login</button>
+        <button type="submit">
+          Login
+        </button>
       </form>
     </div>
   );

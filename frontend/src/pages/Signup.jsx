@@ -3,9 +3,11 @@ import axios from "axios";
 import "../styles/login.css";
 
 function Signup() {
-  const [name, setName] = useState("");
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState("Project Manager");
 
   const registerUser = async (e) => {
     e.preventDefault();
@@ -14,17 +16,39 @@ function Signup() {
       const response = await axios.post(
         "http://127.0.0.1:8000/auth/signup",
         {
-          name,
-          email,
-          password,
+          full_name: fullName,
+          email: email,
+          password: password,
+          confirm_password: confirmPassword,
+          role: role,
         }
       );
 
-      alert("Registration Successful");
+      alert("Registration Successful!");
+
       console.log(response.data);
+
+      setFullName("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+      setRole("Project Manager");
     } catch (error) {
       console.log(error.response?.data);
-      alert(error.response?.data?.detail || "Registration Failed");
+
+      if (error.response?.data?.detail) {
+        if (Array.isArray(error.response.data.detail)) {
+          alert(
+            error.response.data.detail
+              .map((err) => err.msg)
+              .join("\n")
+          );
+        } else {
+          alert(error.response.data.detail);
+        }
+      } else {
+        alert("Registration Failed");
+      }
     }
   };
 
@@ -36,8 +60,8 @@ function Signup() {
         <input
           type="text"
           placeholder="Full Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
           required
         />
 
@@ -57,7 +81,26 @@ function Signup() {
           required
         />
 
-        <button type="submit">Create Account</button>
+        <input
+          type="password"
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+        />
+
+        <select
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+        >
+          <option value="Project Manager">Project Manager</option>
+          <option value="Engineer">Engineer</option>
+          <option value="Analyst">Analyst</option>
+        </select>
+
+        <button type="submit">
+          Create Account
+        </button>
       </form>
     </div>
   );

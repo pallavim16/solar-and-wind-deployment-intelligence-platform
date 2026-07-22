@@ -51,3 +51,15 @@ def get_sites_by_project(
         raise HTTPException(status_code=404, detail="Project not found")
 
     return db.query(Site).filter(Site.project_id == project_id).all()
+
+@router.get("/", response_model=list[SiteOut])
+def get_all_sites(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return (
+        db.query(Site)
+        .join(Project)
+        .filter(Project.owner_id == current_user.id)
+        .all()
+    )
